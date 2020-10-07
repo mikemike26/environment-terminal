@@ -13,6 +13,7 @@
  */
 
 import {LitElement, html, css} from 'lit-element';
+import 'xterm';
 
 /**
  * An example element.
@@ -20,7 +21,7 @@ import {LitElement, html, css} from 'lit-element';
  * @slot - This element has a slot
  * @csspart button - The button
  */
-export class MyElement extends LitElement {
+export class EnvTerminal extends LitElement {
   static get styles() {
     return css`
       :host {
@@ -42,7 +43,7 @@ export class MyElement extends LitElement {
       /**
        * The number of times the button has been clicked.
        */
-      count: {type: Number},
+      url: {type: String},
     };
   }
 
@@ -52,19 +53,25 @@ export class MyElement extends LitElement {
     this.count = 0;
   }
 
-  render() {
-    return html`
-      <h1>Hello, ${this.name}!</h1>
-      <button @click=${this._onClick} part="button">
-        Click Count: ${this.count}
-      </button>
-      <slot></slot>
-    `;
+  get terminal() {
+    return this.shadowRoot.getElementById('terminal');
   }
 
-  _onClick() {
-    this.count++;
+  firstUpdated() {
+    this.term = new Terminal();
+    this.term.open(this.terminal);
+    this.term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ');
+  }
+
+  render() {
+    return html`
+      <link rel="stylesheet" href="../node_modules/xterm/css/xterm.css">
+      <div>
+        <div id="terminal"></div>
+        <p>${this.url}</p>
+      </div>
+    `;
   }
 }
 
-window.customElements.define('my-element', MyElement);
+window.customElements.define('env-terminal', EnvTerminal);
